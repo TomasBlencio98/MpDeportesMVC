@@ -1,0 +1,48 @@
+﻿@model SportEditVm
+@{
+    ViewData["Title"] = "New/Edit Sport";
+}
+<form method="post" asp-action="UpSert" class="w-75">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="SportId" />
+
+    <div class="border p-3 bg-white">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+            <h2 class="text-info pl-3">@(Model.SportId == 0 ? "Add Sport" : "Edit Sport")</h2>
+
+        </div>
+        <div class="form-group row py-2">
+            <label asp-for="SportName"></label>
+            <input asp-for="SportName" class="form-control" />
+            <span asp-validation-for="SportName" class="text-danger"></span>
+
+        </div>
+        @if (Model.SportId == 0)
+        {
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-floppy2-fill"></i>
+                Create
+            </button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-warning">
+                <i class="bi bi-pencil"></i>
+                Edit
+            </button>
+
+        }
+        <a asp-action="Index" class="btn btn-success btn-block">
+            <i class="bi bi-backspace"></i>
+            Back to List
+        </a>
+
+
+    </div>
+</form>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

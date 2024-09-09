@@ -1,0 +1,143 @@
+﻿@model IPagedList<ShoeListVm>
+@using X.PagedList
+@using X.PagedList.Mvc.Core;
+@{
+    ViewData["Title"] = "Shoes List";
+}
+<div class="container">
+    @Html.AntiForgeryToken()
+    <div class="row mb-3">
+        <div class="col-6">
+            <h3>Shoes List</h3>
+
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Shoe" asp-action="UpSert" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i>
+                Nuevo
+            </a>
+        </div>
+    </div>
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                @* <th style="width:10%">ID</th> *@
+                <th style="width:10%">Brand</th>
+                <th style="width:10%">Sport</th>
+                <th style="width:10%">Genre</th>
+                <th style="width:10%">Colour</th>
+                <th style="width:20%">Descripcion</th>
+                <th style="width:10%">Modelo</th>
+                <th style="width:10%">Precio</th>
+                <th style="width:15%">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr id="@item.ShoeId">
+                        @* <td>
+                            @item.ShoeId
+
+                        </td> *@
+                        <td>
+                            @item.Brand
+                        </td>
+                        <td>
+                            @item.Sport
+                        </td>
+                        <td>
+                            @item.Genre
+                        </td>
+                        <td>
+                            @item.Colour
+                        </td>
+                        <td>
+                            @item.Description
+                        </td>
+                        <td>
+                            @item.Model
+                        </td>
+                        <td>
+                            @item.Price
+                        </td>
+                        <td>
+                            <a class="btn btn-warning" asp-controller="Shoe" asp-action="UpSert" asp-route-id="@item.ShoeId">
+                                <i class="bi bi-pencil-square"></i>&nbsp;
+                                Edit
+                            </a>
+                            <a onclick="Delete('/Shoes/Delete/@item.ShoeId',@item.ShoeId)" class="btn btn-danger">
+                                <i class="bi bi-trash-fill"></i>
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3" class="text-center">
+                        F?uck!!! No Shoes added yet!
+
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+    <div class="d-flex">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions
+           {
+               UlElementClasses = new[] { "pagination" },
+               LiElementClasses = new[] { "page-item" },
+               PageClasses = new[] { "page-link" },
+               DisplayLinkToIndividualPages = true,
+               DisplayPageCountAndCurrentLocation = false,
+               MaximumPageNumbersToDisplay = 10
+           })
+    </div>
+
+
+</div>
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script type="text/javascript">
+
+        function Delete(url, id) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+
+                        success: function (data) {
+                            if (data.success) {
+                                var row = document.getElementById(id);
+                                row.remove();
+                                toastr.success(data.message)
+                            }
+                            else {
+                                toastr.error(data.message)
+                            }
+                        }
+                    })
+                }
+            });
+        }
+    </script>
+}
