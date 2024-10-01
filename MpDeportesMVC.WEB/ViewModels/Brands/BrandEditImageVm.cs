@@ -3,13 +3,14 @@ using System.ComponentModel;
 
 namespace MpDeportesMVC.WEB.ViewModels.Brands
 {
-    public class BrandEditVm
+    public class BrandEditImageVm
     {
         public int BrandId { get; set; }
         [Required(ErrorMessage = "{0} este campo es requerido")]
         [StringLength(200, ErrorMessage = "{0} debe tener entre {2} y {1} caracteres", MinimumLength = 3)]
         [DisplayName("Marca")]
         public string? BrandName { get; set; }
+
         [Display(Name = "Image")]
         public string? ImageUrl { get; set; }
 

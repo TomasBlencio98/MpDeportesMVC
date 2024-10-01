@@ -30,12 +30,12 @@ namespace MpDeportesMVC.Datos.Repositorios
                     && s.ShoeId == Shoe.ShoeId);
         }
 
-        public bool EstaRelacionado(Shoe shoe, Size size)
+        public bool EstaRelacionado(Shoe shoe)
         {
-            if (shoe == null || size == null) return false;
+            if (shoe == null) return false;
 
-            return _db!.ShoesSizes.Any(pp => pp.ShoeId == shoe.ShoeId
-                && pp.SizeId == size.SizeId);
+            // Verifica si el zapato tiene alguna relación con algún tamaño
+            return _db!.ShoesSizes.Any(ss => ss.ShoeId == shoe.ShoeId);
         }
 
         public void Update(Shoe Shoe)

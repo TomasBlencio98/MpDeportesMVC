@@ -1,4 +1,5 @@
-﻿using MpDeportesMVC.Datos.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using MpDeportesMVC.Datos.Interfaces;
 using MpDeportesMVC.Entidades;
 
 namespace MpDeportesMVC.Datos.Repositorios
@@ -9,6 +10,11 @@ namespace MpDeportesMVC.Datos.Repositorios
         public RepositorioBrand(MpDeportesDbContext? db) : base(db)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
+        }
+
+        public int ContarZapatillasPorMarca(int brandId)
+        {
+            return _db.Shoes.Count(s => s.BrandId == brandId);
         }
 
         public bool EstaRelacionado(int id)
@@ -24,6 +30,17 @@ namespace MpDeportesMVC.Datos.Repositorios
             }
             return _db.Brands.Any(s => s.BrandName == Brand.BrandName &&
                     s.BrandId != Brand.BrandId);
+        }
+
+        public List<Shoe> ObtenerZapatillasPorMarca(int brandId)
+        {
+            return _db.Shoes
+                      .Include(s => s.Brand)    
+                      .Include(s => s.Sport)    
+                      .Include(s => s.Genre)    
+                      .Include(s => s.Colour)   
+                      .Where(s => s.BrandId == brandId)
+                      .ToList();
         }
 
         public void Update(Brand Brand)

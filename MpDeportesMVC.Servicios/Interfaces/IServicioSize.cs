@@ -15,5 +15,7 @@ namespace MpDeportesMVC.Servicios.Interfaces
             bool tracked = true);
         bool Existe(Size Size);
         bool EstaRelacionado(int id);
+        int ContarZapatillasPorTalle(int sizeId);
+        List<Shoe> ObtenerZapatillasPorTalle(int sizeId);
     }
 }

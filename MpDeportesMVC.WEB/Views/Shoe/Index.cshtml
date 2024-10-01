@@ -1,4 +1,4 @@
-﻿@model IPagedList<ShoeListVm>
+﻿@model ShoeFilterVm
 @using X.PagedList
 @using X.PagedList.Mvc.Core;
 @{
@@ -18,7 +18,69 @@
             </a>
         </div>
     </div>
-    <table class="table table-bordered table-hover">
+
+
+    <form method="get" class="form-inline" asp-action="Index">
+        <div class="d-flex flex-row align-items-center">
+            <div class="col-auto mx-1">
+                <label for="pageSize">Show:</label>
+            </div>
+            <div class="col-auto mx-2">
+                <select class="form-select" id="pageSize" name="pageSize" onchange="this.form.submit()" style="width:70px">
+                    @{
+                        var options = new List<int> { 5, 10, 15, 20 };
+                        foreach (var option in options)
+                        {
+                            if (ViewBag.currentPageSize == option)
+                            {
+                                <option selected value="@option">@option</option>
+
+                            }
+                            else
+                            {
+                                <option value="@option">@option</option>
+
+                            }
+                        }
+                    }
+                </select>
+
+            </div>
+            <div class="col-auto mx-2">
+                Brand:
+            </div>
+
+            <div class="col-auto mx-2" style="width: 200px;">
+                <select class="form-select" name="FilterBrandId" id="FilterBrandId">
+                    <option disabled selected value="0">Select Brand</option>
+                    @{
+                        foreach (var item in Model.Brands!)
+                        {
+                            if (ViewBag.currentFilterBrandId == int.Parse(item.Value))
+                            {
+                                <option selected value="@item.Value">@item.Text</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-auto d-flex">
+                <button type="submit" class="btn btn-primary mx-2">
+                    <i class="bi bi-search"></i> Search
+                </button>
+                <button type="submit" class="btn btn-secondary" id="viewAll" name="viewAll" value="true">
+                    <i class="bi bi-list"></i> View All
+                </button>
+            </div>
+        </div>
+    </form>
+
+
+    <table class="table table-bordered table-hover mt-3">
         <thead>
             <tr>
                 @* <th style="width:10%">ID</th> *@
@@ -33,9 +95,9 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model.Any())
+            @if (Model.Shoes!.Any())
             {
-                foreach (var item in Model)
+                foreach (var item in Model.Shoes!)
                 {
                     <tr id="@item.ShoeId">
                         @* <td>
@@ -60,15 +122,15 @@
                         <td>
                             @item.Model
                         </td>
-                        <td>
-                            @item.Price
+                        <td style="text-align:right">
+                            @item.Price.ToString("C2");
                         </td>
                         <td>
                             <a class="btn btn-warning" asp-controller="Shoe" asp-action="UpSert" asp-route-id="@item.ShoeId">
                                 <i class="bi bi-pencil-square"></i>&nbsp;
                                 Edit
                             </a>
-                            <a onclick="Delete('/Shoes/Delete/@item.ShoeId',@item.ShoeId)" class="btn btn-danger">
+                            <a onclick="Delete('/Shoe/Delete/@item.ShoeId',@item.ShoeId,'@item.Model')" class="btn btn-danger">
                                 <i class="bi bi-trash-fill"></i>
                                 Delete
                             </a>
@@ -88,56 +150,13 @@
             }
         </tbody>
     </table>
-    <div class="d-flex">
-        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions
-           {
-               UlElementClasses = new[] { "pagination" },
-               LiElementClasses = new[] { "page-item" },
-               PageClasses = new[] { "page-link" },
-               DisplayLinkToIndividualPages = true,
-               DisplayPageCountAndCurrentLocation = false,
-               MaximumPageNumbersToDisplay = 10
-           })
-    </div>
+    <partial name="_Page" model="@Model.Shoes" />
 
 
 </div>
 @section Scripts {
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-    <script type="text/javascript">
-
-        function Delete(url, id) {
-            Swal.fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: url,
-                        type: 'DELETE',
-                        headers: {
-                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                        },
-
-                        success: function (data) {
-                            if (data.success) {
-                                var row = document.getElementById(id);
-                                row.remove();
-                                toastr.success(data.message)
-                            }
-                            else {
-                                toastr.error(data.message)
-                            }
-                        }
-                    })
-                }
-            });
-        }
-    </script>
+    <script type="text/javascript"></script>
+    <script src="~/js/common.js"></script>
 }

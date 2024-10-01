@@ -1,4 +1,6 @@
-﻿using MpDeportesMVC.Datos.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using MpDeportesMVC.Datos.Interfaces;
+using MpDeportesMVC.Entidades;
 using Size = MpDeportesMVC.Entidades.Size;
 
 namespace MpDeportesMVC.Datos.Repositorios
@@ -11,6 +13,16 @@ namespace MpDeportesMVC.Datos.Repositorios
         {
             _db = db ?? throw new ArgumentNullException(nameof(db));
         }
+
+        public int ContarZapatillasPorTalle(int sizeId)
+        {
+            return _db.ShoesSizes
+                   .Where(ss => ss.SizeId == sizeId)
+                   .Select(ss => ss.ShoeId)
+                   .Distinct()
+                   .Count();
+        }
+
         public bool EstaRelacionado(int id)
         {
             return _db.ShoesSizes.Any(ss => ss.SizeId == id);
@@ -24,6 +36,18 @@ namespace MpDeportesMVC.Datos.Repositorios
             }
             return _db.Sizes.Any(s => s.SizeNumber == Size.SizeNumber &&
                     s.SizeId != Size.SizeId);
+        }
+
+        public List<Shoe> ObtenerZapatillasPorTalle(int sizeId)
+        {
+            return _db.ShoesSizes
+               .Where(ss => ss.SizeId == sizeId)
+               .Include(ss => ss.Shoe) .ThenInclude(s => s.Brand) 
+               .Include(ss => ss.Shoe).ThenInclude(s => s.Colour) 
+               .Include(ss => ss.Shoe).ThenInclude(s => s.Genre) 
+               .Include(ss => ss.Shoe).ThenInclude(s => s.Sport) 
+               .Select(ss => ss.Shoe) 
+               .ToList();
         }
 
         public void Update(Size Size)

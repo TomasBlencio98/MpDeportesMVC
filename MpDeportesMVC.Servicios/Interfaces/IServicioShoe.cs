@@ -14,6 +14,6 @@ namespace MpDeportesMVC.Servicios.Interfaces
             string? propertiesNames = null,
             bool tracked = true);
         bool Existe(Shoe Shoe);
-        bool EstaRelacionado(Shoe Shoe, Size Size);
+        bool EstaRelacionado(Shoe Shoe);
     }
 }

@@ -55,7 +55,7 @@ namespace MpDeportesMVC.WEB.ViewModels.Shoes
         public string Model { get; set; } = null!;
 
         [Required(ErrorMessage = "{0} is required")]
-        [Range(typeof(decimal), "0.01", "79228162514264337593543950335", ErrorMessage = "{0} must be greater than zero")]
+        [Range(0.05, 1000000, ErrorMessage = "{0} must be greater than zero")]
         [DisplayName("Price")]
         public decimal Price { get; set; }
 

@@ -15,5 +15,7 @@ namespace MpDeportesMVC.Servicios.Interfaces
             bool tracked = true);
         bool Existe(Brand Brand);
         bool EstaRelacionado(int id);
+        int ContarZapatillasPorMarca(int brandId);
+        List<Shoe> ObtenerZapatillasPorMarca(int brandId);
     }
 }

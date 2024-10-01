@@ -18,14 +18,35 @@ namespace MpDeportesMVC.WEB.Controllers
             _mapper = mapper;
         }
 
-        public IActionResult Index(int? page)
+        public IActionResult Index(int? page, string? searchTerm = null, bool viewAll = false, int pageSize = 10)
         {
             int pageNumber = page ?? 1;
-            int pageSize = 5;
-            var Colours = servicio?.GetAll(orderBy: o => o.OrderBy(c => c.ColourName));
-            var ColoursVm = _mapper?.Map<List<ColourListVm>>(Colours)
+            ViewBag.currentPageSize = pageSize;
+            IEnumerable<Colour>? colours;
+            if (!viewAll)
+            {
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    colours = servicio?
+                        .GetAll(orderBy: o => o.OrderBy(c => c.ColourName),
+                            filter: c => c.ColourName.Contains(searchTerm));
+                    ViewBag.currentSearchTerm = searchTerm;
+                }
+                else
+                {
+                    colours = servicio?.GetAll
+                        (orderBy: o => o.OrderBy(c => c.ColourName));
+                }
+            }
+            else
+            {
+                colours = servicio?.GetAll
+                        (orderBy: o => o.OrderBy(c => c.ColourName));
+            }
+
+            var coloursVm = _mapper?.Map<List<ColourListVm>>(colours)
                 .ToPagedList(pageNumber, pageSize);
-            return View(ColoursVm);
+            return View(coloursVm);
         }
 
         public IActionResult UpSert(int? id)

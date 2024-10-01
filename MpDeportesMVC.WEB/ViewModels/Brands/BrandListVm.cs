@@ -7,5 +7,7 @@ namespace MpDeportesMVC.WEB.ViewModels.Brands
         public int BrandId { get; set; }
         [DisplayName("Marcas")]
         public string? BrandName { get; set; }
+        [DisplayName("Zapatillas Asociadas")]
+        public int ZapatillasCount { get; set; }
     }
 }

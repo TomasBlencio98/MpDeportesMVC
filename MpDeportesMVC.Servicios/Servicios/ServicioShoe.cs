@@ -34,9 +34,9 @@ namespace MpDeportesMVC.Servicios.Servicios
             }
         }
 
-        public bool EstaRelacionado(Shoe Shoe, Size Size)
+        public bool EstaRelacionado(Shoe Shoe)
         {
-            return _repository!.EstaRelacionado(Shoe,Size);
+            return _repository!.EstaRelacionado(Shoe);
         }
 
 

@@ -18,15 +18,20 @@ namespace MpDeportesMVC.WEB.Controllers
             _mapper = mapper;
         }
 
-        public IActionResult Index(int? page)
+        public IActionResult Index(int? page, int pageSize = 10)
         {
             int pageNumber = page ?? 1;
-            int pageSize = 10;
+            ViewBag.currentPageSize = pageSize;
             var Sizes = servicio?.GetAll
                 (orderBy: o => o.OrderBy(c => c.SizeNumber));
-            var SizesVm = _mapper?.Map<List<SizeListVm>>(Sizes)
-                .ToPagedList(pageNumber, pageSize);
-            return View(SizesVm);
+            var SizesVm = _mapper?.Map<List<SizeListVm>>(Sizes);
+                //.ToPagedList(pageNumber, pageSize);
+            foreach (var size in SizesVm!)
+            {
+                size.CantidadZapatillas = (int)(servicio?.ContarZapatillasPorTalle(size.SizeId))!;
+            }
+            return View(SizesVm.OrderByDescending(o => o.CantidadZapatillas).
+                ToPagedList(pageNumber, pageSize));
         }
 
         public IActionResult UpSert(int? id)
@@ -95,6 +100,17 @@ namespace MpDeportesMVC.WEB.Controllers
                 ModelState.AddModelError(string.Empty, "An error occurred while editing the record.");
                 return View(SizeVm);
             }
+        }
+
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            var shoe = servicio?.ObtenerZapatillasPorTalle(id);
+            if (shoe == null || shoe.Count == 0)
+            {
+                ViewData["Mensaje"] = "No hay zapatillas asociadas a este talle.";
+            }
+            return View(shoe);
         }
 
         [HttpDelete]

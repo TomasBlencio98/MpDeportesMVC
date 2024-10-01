@@ -11,6 +11,6 @@ namespace MpDeportesMVC.Datos.Interfaces
     {
         void Update(Shoe Shoe);
         bool Existe(Shoe Shoe);
-        bool EstaRelacionado(Shoe shoe, Size size);
+        bool EstaRelacionado(Shoe shoe);
     }
 }

@@ -18,6 +18,11 @@ namespace MpDeportesMVC.Servicios.Servicios
             _unitOfWork = unitOfWork ?? throw new ArgumentException("Dependencies not set");
         }
 
+        public int ContarZapatillasPorMarca(int brandId)
+        {
+            return _repository!.ContarZapatillasPorMarca(brandId);
+        }
+
         public void Delete(Brand Brand)
         {
             try
@@ -59,6 +64,10 @@ namespace MpDeportesMVC.Servicios.Servicios
             return _repository!.GetAll(filter, orderBy, propertiesNames);
         }
 
+        public List<Shoe> ObtenerZapatillasPorMarca(int brandId)
+        {
+            return _repository!.ObtenerZapatillasPorMarca(brandId);
+        }
 
         public void Save(Brand Brand)
         {

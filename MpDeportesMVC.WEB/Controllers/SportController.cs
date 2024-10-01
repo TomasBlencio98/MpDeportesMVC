@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MpDeportesMVC.Entidades;
 using MpDeportesMVC.Servicios.Interfaces;
 using MpDeportesMVC.WEB.ViewModels.Sports;
+using MpDeportesMVC.WEB.ViewModels.Sports;
 using X.PagedList;
 
 namespace MpDeportesMVC.WEB.Controllers
@@ -18,13 +19,33 @@ namespace MpDeportesMVC.WEB.Controllers
             _mapper = mapper;
         }
 
-        public IActionResult Index(int? page)
+        public IActionResult Index(int? page, string? searchTerm = null, bool viewAll = false, int pageSize = 10)
         {
             int pageNumber = page ?? 1;
-            int pageSize = 5;
-            var Sports = servicio?.GetAll
-                (orderBy: o => o.OrderBy(c => c.SportName));
-            var SportsVm = _mapper?.Map<List<SportListVm>>(Sports)
+            ViewBag.currentPageSize = pageSize;
+            IEnumerable<Sport>? sports;
+            if (!viewAll)
+            {
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    sports = servicio?
+                        .GetAll(orderBy: o => o.OrderBy(c => c.SportName),
+                            filter: c => c.SportName.Contains(searchTerm));
+                    ViewBag.currentSearchTerm = searchTerm;
+                }
+                else
+                {
+                    sports = servicio?.GetAll
+                        (orderBy: o => o.OrderBy(c => c.SportName));
+                }
+            }
+            else
+            {
+                sports = servicio?.GetAll
+                        (orderBy: o => o.OrderBy(c => c.SportName));
+            }
+
+            var SportsVm = _mapper?.Map<List<SportListVm>>(sports)
                 .ToPagedList(pageNumber, pageSize);
             return View(SportsVm);
         }

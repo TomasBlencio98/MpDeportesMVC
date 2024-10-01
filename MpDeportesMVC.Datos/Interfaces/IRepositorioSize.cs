@@ -7,5 +7,7 @@ namespace MpDeportesMVC.Datos.Interfaces
         void Update(Size Size);
         bool Existe(Size Size);
         bool EstaRelacionado(int id);
+        int ContarZapatillasPorTalle(int sizeId);
+        List<Shoe> ObtenerZapatillasPorTalle(int sizeId);
     }
 }

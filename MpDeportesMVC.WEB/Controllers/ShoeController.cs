@@ -35,15 +35,39 @@ namespace MpDeportesMVC.WEB.Controllers
 
         public object servicioBrand { get; private set; }
 
-        public IActionResult Index(int? page)
+        public IActionResult Index(int? page, int? FilterBrandId, int pageSize = 10, bool viewAll = false)
         {
             var pageNumber = page ?? 1;
-            int pageSize = 10;
-            var Shoes = _service!
-                .GetAll(orderBy: o => o.OrderBy(s => s.Brand!.BrandName),
-                propertiesNames: "Brand,Sport,Colour,Genre");
-            var ShoesVm = _mapper!.Map<List<ShoeListVm>>(Shoes);
-            return View(ShoesVm.ToPagedList(pageNumber, pageSize));
+            ViewBag.currentPageSize = pageSize;
+            IEnumerable<Shoe>? shoes;
+            if (FilterBrandId is null || viewAll)
+            {
+                shoes = _service!
+                    .GetAll(orderBy: o => o.OrderBy(s => s.Brand!.BrandName),
+                    propertiesNames: "Brand,Genre,Sport,Colour");
+            }
+            else
+            {
+                shoes = _service!
+                     .GetAll(orderBy: o => o.OrderBy(s => s.Brand!.BrandName),
+                             filter: s => s.BrandId == FilterBrandId,
+                     propertiesNames: "Brand,Genre,Sport,Colour");
+                ViewBag.currentFilterBrandId = FilterBrandId;
+            }
+            var shoesVm = _mapper!
+                .Map<List<ShoeListVm>>(shoes);
+            var shoeFilterVm = new ShoeFilterVm
+            {
+                Shoes = shoesVm.ToPagedList(pageNumber, pageSize),
+                Brands = _servicioBrand.GetAll(orderBy: o => o.OrderBy(c => c.BrandName))
+                    .Select(c => new SelectListItem
+                    {
+                        Text = c.BrandName,
+                        Value = c.BrandId.ToString()
+                    })
+                    .ToList()
+            };
+            return View(shoeFilterVm);
         }
 
         public IActionResult UpSert(int? id)
@@ -138,6 +162,36 @@ namespace MpDeportesMVC.WEB.Controllers
                 CargarComboBoxs(ShoeEditVm);
 
                 return View(ShoeEditVm);
+            }
+        }
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            if (id is null || id == 0)
+            {
+                return NotFound();
+            }
+            Shoe? Shoe = _service?.Get(filter: g => g.ShoeId == id);
+            if (Shoe is null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                if (_service == null || _mapper == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Dependencias no están configuradas correctamente");
+                }
+                if (_service.EstaRelacionado(Shoe))
+                {
+                    return Json(new { success = false, message = "Related Record... Delete Deny!!" }); ;
+                }
+                _service.Delete(Shoe);
+                return Json(new { success = true, message = "Record successfully deleted" });
+            }
+            catch (Exception)
+            {
+                return Json(new { success = false, message = "Couldn't delete record!!! " }); ;
             }
         }
 

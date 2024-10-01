@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MpDeportesMVC.Entidades;
 using MpDeportesMVC.Servicios.Interfaces;
 using MpDeportesMVC.WEB.ViewModels.Genres;
+using MpDeportesMVC.WEB.ViewModels.Genres;
 using X.PagedList;
 
 namespace MpDeportesMVC.WEB.Controllers
@@ -18,12 +19,33 @@ namespace MpDeportesMVC.WEB.Controllers
             _mapper = mapper;
         }
 
-        public IActionResult Index(int? page)
+        public IActionResult Index(int? page, string? searchTerm = null, bool viewAll = false, int pageSize = 10)
         {
             int pageNumber = page ?? 1;
-            int pageSize = 5;
-            var genres = servicio?.GetAll(orderBy: o => o.OrderBy(c => c.GenreName));
-            var genresVm=_mapper?.Map<List<GenreListVm>>(genres)
+            ViewBag.currentPageSize = pageSize;
+            IEnumerable<Genre>? genres;
+            if (!viewAll)
+            {
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    genres = servicio?
+                        .GetAll(orderBy: o => o.OrderBy(c => c.GenreName),
+                            filter: c => c.GenreName.Contains(searchTerm));
+                    ViewBag.currentSearchTerm = searchTerm;
+                }
+                else
+                {
+                    genres = servicio?.GetAll
+                        (orderBy: o => o.OrderBy(c => c.GenreName));
+                }
+            }
+            else
+            {
+                genres = servicio?.GetAll
+                        (orderBy: o => o.OrderBy(c => c.GenreName));
+            }
+
+            var genresVm = _mapper?.Map<List<GenreListVm>>(genres)
                 .ToPagedList(pageNumber, pageSize);
             return View(genresVm);
         }
