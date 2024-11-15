@@ -1,0 +1,48 @@
+﻿@model ShoeSizeVm
+
+<h3>Agregar Talle para: @Model.Brand.BrandName - @Model.Genre.GenreName - @Model.Colour.ColourName</h3>
+
+<form method="post" asp-action="AddSize">
+    @Html.AntiForgeryToken()
+
+    <!-- Campo oculto para el ID de la zapatilla -->
+    <input type="hidden" name="ShoeId" value="@Model.ShoeId" />
+
+    <div class="form-group">
+        <label for="SizeId">Talle</label>
+        <select id="SizeId" name="SizeId" class="form-control" required>
+            <option value="">Seleccione un talle</option>
+            @foreach (var size in Model.Sizes)
+            {
+                <option value="@size.Value">@size.Text</option>
+            }
+        </select>
+        @if (ViewData.ModelState["SizeId"]?.Errors.Count > 0)
+        {
+            <div class="text-danger">
+                @ViewData.ModelState["SizeId"].Errors[0].ErrorMessage
+            </div>
+        }
+    </div>
+
+    <div class="form-group">
+        <label for="Stock">Stock</label>
+        <input type="number" id="Stock" name="Stock" class="form-control" value="@Model.Stock" required min="1" />
+        @if (ViewData.ModelState["Stock"]?.Errors.Count > 0)
+        {
+            <div class="text-danger">
+                @ViewData.ModelState["Stock"].Errors[0].ErrorMessage
+            </div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+
+    @if (TempData["success"] != null)
+    {
+        <div class="alert alert-success mt-3">
+            @TempData["success"]
+        </div>
+    }
+</form>
+

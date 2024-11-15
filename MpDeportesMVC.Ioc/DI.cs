@@ -28,6 +28,8 @@ namespace MpDeportesMVC.Ioc
             servicios.AddScoped<IServicioSize, ServicioSize>();
             servicios.AddScoped<IRepositorioShoe, RepositorioShoe>();
             servicios.AddScoped<IServicioShoe, ServicioShoe>();
+            servicios.AddScoped<IRepositorioShoeSize, RepositorioShoeSize>();
+            servicios.AddScoped<IServicioShoeSize, ServicioShoeSize>();
 
             servicios.AddScoped<IUnitOfWork, UnitOfWork>();
 
